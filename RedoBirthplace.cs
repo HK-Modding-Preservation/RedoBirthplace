@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Security.Cryptography;
 using HutongGames.PlayMaker;
 using Modding;
-using SFCore;
 using SFCore.Utils;
-using UnityEngine;
 using UnityEngine.SceneManagement;
-using Random = UnityEngine.Random;
 
 namespace RedoBirthplace
 {
@@ -24,7 +18,7 @@ namespace RedoBirthplace
         }
 
         // Thx to 56
-        public override string GetVersion() => SFCore.Utils.Util.GetVersion(Assembly.GetExecutingAssembly());
+        public override string GetVersion() => Util.GetVersion(Assembly.GetExecutingAssembly());
 
         public override void Initialize()
         {
