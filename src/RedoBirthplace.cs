@@ -6,60 +6,59 @@ using Modding;
 using SFCore.Utils;
 using UnityEngine.SceneManagement;
 
-namespace RedoBirthplace
+namespace RedoBirthplace;
+
+internal class RedoBirthplace : Mod
 {
-    internal class RedoBirthplace : Mod
+    internal static RedoBirthplace Instance;
+
+    public RedoBirthplace() : base("Redo Birthplace")
     {
-        internal static RedoBirthplace Instance;
+        InitCallbacks();
+    }
 
-        public RedoBirthplace() : base("Redo Birthplace")
+    // Thx to 56
+    public override string GetVersion() => Util.GetVersion(Assembly.GetExecutingAssembly());
+
+    public override void Initialize()
+    {
+        Log("Initializing");
+        Instance = this;
+
+        Log("Initialized");
+    }
+
+    private void InitCallbacks()
+    {
+        // Hooks
+        UnityEngine.SceneManagement.SceneManager.activeSceneChanged += OnSceneChanged;
+    }
+
+    private void OnSceneChanged(Scene from, Scene to)
+    {
+        if (to.name == "Abyss_15")
         {
-            InitCallbacks();
-        }
+            #region Dream Enter Abyss
 
-        // Thx to 56
-        public override string GetVersion() => Util.GetVersion(Assembly.GetExecutingAssembly());
+            var dreamEnterAbyssGo = to.FindRoot("Dream Enter Abyss");
+            var controlFsm = dreamEnterAbyssGo.LocateMyFSM("Control");
+            var initState = controlFsm.FsmStates.First(x => x.Name == "Init");
+            var actions = new List<FsmStateAction>(initState.Actions);
+            actions.RemoveAt(2);
+            initState.Actions = actions.ToArray();
 
-        public override void Initialize()
-        {
-            Log("Initializing");
-            Instance = this;
+            #endregion
 
-            Log("Initialized");
-        }
+            #region Mirror
 
-        private void InitCallbacks()
-        {
-            // Hooks
-            UnityEngine.SceneManagement.SceneManager.activeSceneChanged += OnSceneChanged;
-        }
+            var mirrorGo = to.FindRoot("Mirror");
+            var mirrorFsm = mirrorGo.LocateMyFSM("FSM");
+            var mirrorCheckState = mirrorFsm.FsmStates.First(x => x.Name == "Check");
+            var mirrorCheckActions = new List<FsmStateAction>(mirrorCheckState.Actions);
+            mirrorCheckActions.RemoveAt(0);
+            mirrorCheckState.Actions = mirrorCheckActions.ToArray();
 
-        private void OnSceneChanged(Scene from, Scene to)
-        {
-            if (to.name == "Abyss_15")
-            {
-                #region Dream Enter Abyss
-
-                var dreamEnterAbyssGo = to.FindRoot("Dream Enter Abyss");
-                var controlFsm = dreamEnterAbyssGo.LocateMyFSM("Control");
-                var initState = controlFsm.FsmStates.First(x => x.Name == "Init");
-                var actions = new List<FsmStateAction>(initState.Actions);
-                actions.RemoveAt(2);
-                initState.Actions = actions.ToArray();
-
-                #endregion
-
-                #region Mirror
-
-                var mirrorGo = to.FindRoot("Mirror");
-                var mirrorFsm = mirrorGo.LocateMyFSM("FSM");
-                var mirrorCheckState = mirrorFsm.FsmStates.First(x => x.Name == "Check");
-                var mirrorCheckActions = new List<FsmStateAction>(mirrorCheckState.Actions);
-                mirrorCheckActions.RemoveAt(0);
-                mirrorCheckState.Actions = mirrorCheckActions.ToArray();
-
-                #endregion
-            }
+            #endregion
         }
     }
 }
